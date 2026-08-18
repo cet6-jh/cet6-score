@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <!-- 移动端关键：禁止缩放、宽度自适应、初始缩放 1 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <!-- 强制使用最新 IE/Chrome 渲染 -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <!-- 移动端优化：电话号码/邮箱不被识别为链接 -->
+    <meta name="format-detection" content="telephone=no, email=no">
+    <!-- SEO/分享优化 -->
+    <meta name="description" content="CET6 成绩查询演示页面 - 仿中国教育考试网风格">
+    <meta name="keywords" content="CET6,四六级,成绩查询,教育考试">
+    <meta name="author" content="CET6 Score Demo">
+    <meta name="theme-color" content="#003F88">
+    <!-- 微信/QQ 分享卡片 -->
+    <meta property="og:title" content="CET6 成绩查询演示">
+    <meta property="og:description" content="全国大学英语六级考试成绩查询 - 仿官方风格演示页">
+    <meta property="og:type" content="website">
+    <title>中国教育考试网 - 全国大学英语四、六级考试成绩查询</title>
+    <!-- 内联 SVG favicon（避免 404） -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><path d=%22M32 4 L56 14 L56 32 C56 46 46 56 32 60 C18 56 8 46 8 32 L8 14 Z%22 fill=%22%23003F88%22/></svg>">
+    <style>
+        /* ============================================
+         * CSS 变量：定义整套蓝色调与组件尺寸
+         * ============================================ */
+        :root {
+            --color-primary-deep: #003F88;     /* 主品牌深蓝（导航、Logo） */
+            --color-primary: #1E5BA8;          /* 主操作蓝（按钮、强调） */
+            --color-link: #2B7CD4;             /* 链接/数值蓝 */
+            --color-card-header: #E8F2FB;      /* 卡片标题浅蓝 */
+            --color-bg-page: #F5F9FD;          /* 页面背景 */
+            --color-accent: #D9534F;           /* 总分红色 */
+            --color-text-primary: #333333;
+            --color-text-secondary: #666666;
+            --color-text-tertiary: #999999;
+            --color-border: #E5E5E5;
+            --color-white: #FFFFFF;
+            --radius-card: 8px;
+            --radius-input: 4px;
+            --spacing-unit: 16px;
+            --font-family: "Microsoft YaHei", "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+            --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.06);
+            --container-max: 1200px;
+        }
+
+        /* ============================================
+         * 基础重置
+         * ============================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            font-family: var(--font-family);
+            color: var(--color-text-primary);
+            background-color: var(--color-bg-page);
+            font-size: 14px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        a {
+            color: var(--color-link);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* 工具类：默认隐藏（用于页面切换） */
+        .hidden {
+            display: none !important;
+        }
+
+        /* ============================================
+         * 顶部 Logo 区（两页共用）
+         * ============================================ */
+        .topbar {
+            background: var(--color-white);
+            border-bottom: 1px solid var(--color-border);
+            padding: 16px 0;
+        }
+
+        .topbar-inner {
+            max-width: var(--container-max);
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        /* NEEA 盾形 Logo（纯 SVG 内联，无外部依赖） */
+        .brand-logo {
+            width: 56px;
+            height: 56px;
+        }
+
+        .brand-text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+        }
+
+        .brand-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--color-primary-deep);
+            letter-spacing: 1px;
+        }
+
+        .brand-subtitle {
+            font-size: 11px;
+            color: var(--color-text-secondary);
+            letter-spacing: 1px;
+            margin-top: 4px;
+        }
+
+        /* 顶部右侧图标组 */
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .icon-btn {
+            width: 28px;
+            height: 28px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+        }
+
+        .icon-btn:hover {
+            color: var(--color-primary);
+        }
+
+        .logout-link {
+            font-size: 14px;
+            color: var(--color-link);
+            cursor: pointer;
+        }
+
+        /* ============================================
+         * 导航栏
+         * ============================================ */
+        .navbar {
+            background: var(--color-primary-deep);
+            color: var(--color-white);
+        }
+
+        .navbar-inner {
+            max-width: var(--container-max);
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            overflow-x: auto;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 16px 36px;
+            color: var(--color-white);
+            font-size: 16px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: background 0.2s;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            text-decoration: none;
+        }
+
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.15);
+            font-weight: 600;
+        }
+
+        /* ============================================
+         * 面包屑
+         * ============================================ */
+        .breadcrumb {
+            max-width: var(--container-max);
+            margin: 0 auto;
+            padding: 18px 20px 8px;
+            font-size: 13px;
+            color: var(--color-text-tertiary);
+        }
+
+        .breadcrumb a {
+            color: var(--color-text-secondary);
+        }
+
+        /* ============================================
+         * 登录页
+         * ============================================ */
+        .login-wrap {
+            min-height: calc(100vh - 200px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            background: linear-gradient(180deg, var(--color-bg-page) 0%, #E8F2FB 100%);
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 420px;
+            background: var(--color-white);
+            border-radius: var(--radius-card);
+            box-shadow: var(--shadow-card);
+            padding: 36px 32px 28px;
+        }
+
+        .login-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--color-text-primary);
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .login-subtitle {
+            text-align: center;
+            font-size: 13px;
+            color: var(--color-text-tertiary);
+            margin-bottom: 28px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-input {
+            width: 100%;
+            height: 44px;
+            padding: 0 14px;
+            font-size: 14px;
+            color: var(--color-text-primary);
+            background: var(--color-white);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-input);
+            transition: border-color 0.2s, box-shadow 0.2s;
+            font-family: inherit;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--color-link);
+            box-shadow: 0 0 0 3px rgba(43, 124, 212, 0.15);
+        }
+
+        .form-input::placeholder {
+            color: var(--color-text-tertiary);
+        }
+
+        /* 验证码行（输入框 + 验证码图片 + 刷新） */
+        .captcha-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .captcha-row .form-input {
+            flex: 1;
+        }
+
+        .captcha-img {
+            width: 96px;
+            height: 44px;
+            background: linear-gradient(135deg, #E8F2FB 0%, #D6E8F5 100%);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-input);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: "Courier New", monospace;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--color-primary-deep);
+            letter-spacing: 4px;
+            cursor: pointer;
+            user-select: none;
+            font-style: italic;
+            text-decoration: line-through;
+        }
+
+        .captcha-refresh {
+            font-size: 13px;
+            color: var(--color-link);
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .login-btn {
+            width: 100%;
+            height: 44px;
+            margin-top: 8px;
+            background: var(--color-primary);
+            color: var(--color-white);
+            border: none;
+            border-radius: var(--radius-input);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-family: inherit;
+        }
+
+        .login-btn:hover {
+            background: var(--color-primary-deep);
+        }
+
+        .login-btn:active {
+            transform: translateY(1px);
+        }
+
+        .login-btn.loading {
+            opacity: 0.7;
+            cursor: wait;
+        }
+
+        .login-msg {
+            margin-top: 10px;
+            padding: 0;
+            height: 18px;
+            font-size: 13px;
+            color: var(--color-accent);
+            text-align: center;
+        }
+
+        .login-extras {
+            margin-top: 18px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+        }
+
+        /* ============================================
+         * 成绩页主内容
+         * ============================================ */
+        .page-main {
+            max-width: var(--container-max);
+            margin: 0 auto;
+            padding: 12px 20px 60px;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--color-text-primary);
+            margin: 8px 0 22px;
+            text-align: center;
+        }
+
+        /* 通用卡片 */
+        .card {
+            background: var(--color-white);
+            border-radius: var(--radius-card);
+            box-shadow: var(--shadow-card);
+            overflow: hidden;
+            margin-bottom: 18px;
+        }
+
+        .card-header {
+            background: var(--color-card-header);
+            padding: 14px 20px;
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            text-align: center;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .card-body {
+            padding: 8px 20px;
+        }
+
+        /* 信息行（label + value 两列对齐） */
+        .info-row {
+            display: flex;
+            padding: 14px 0;
+            border-bottom: 1px solid #F0F0F0;
+            font-size: 15px;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            flex: 0 0 140px;
+            color: var(--color-text-secondary);
+            letter-spacing: 4px;
+        }
+
+        .info-value {
+            flex: 1;
+            color: var(--color-text-primary);
+            font-weight: 400;
+            word-break: break-all;
+            text-align: right;
+        }
+
+        /* 成绩行：分数贴右，字号与标签一致 */
+        .score-row {
+            display: flex;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid #F0F0F0;
+            font-size: 14px;
+        }
+
+        .score-row:last-child {
+            border-bottom: none;
+        }
+
+        .score-label {
+            flex: 0 0 140px;
+            color: var(--color-text-secondary);
+            letter-spacing: 4px;
+        }
+
+        .score-value {
+            flex: 1;
+            font-size: 14px;
+            font-weight: 400;
+            color: var(--color-link);
+            text-align: right;
+        }
+
+        /* 总分（红色突出，不加粗、字号与其他分项保持一致） */
+        .score-row.total .score-label {
+            font-weight: 400;
+            color: var(--color-text-secondary);
+            font-size: 14px;
+        }
+
+        .score-row.total .score-value {
+            font-size: 14px;
+            color: var(--color-accent);
+            font-weight: 400;
+        }
+
+        /* ============================================
+         * 页脚版权
+         * ============================================ */
+        .footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 12px;
+            color: var(--color-text-tertiary);
+            border-top: 1px solid var(--color-border);
+            background: var(--color-white);
+        }
+
+        /* ============================================
+         * 响应式：移动端适配
+         * ============================================ */
+        @media (max-width: 768px) {
+            .topbar-inner {
+                padding: 0 12px;
+            }
+
+            .brand-logo {
+                width: 44px;
+                height: 44px;
+            }
+
+            .brand-title {
+                font-size: 16px;
+            }
+
+            .brand-subtitle {
+                font-size: 10px;
+            }
+
+            .navbar-inner {
+                padding: 0 12px;
+            }
+
+            .nav-item {
+                padding: 14px 18px;
+                font-size: 14px;
+            }
+
+            .breadcrumb {
+                padding: 14px 12px 6px;
+                font-size: 12px;
+            }
+
+            .login-wrap {
+                padding: 20px 12px;
+            }
+
+            .login-card {
+                padding: 24px 20px 20px;
+            }
+
+            .page-main {
+                padding: 8px 12px 40px;
+            }
+
+            .page-title {
+                font-size: 18px;
+                margin: 4px 0 16px;
+            }
+
+            .card-header {
+                padding: 12px 16px;
+                font-size: 15px;
+            }
+
+            .card-body {
+                padding: 4px 16px;
+            }
+
+            .info-row,
+            .score-row {
+                padding: 12px 0;
+                font-size: 14px;
+            }
+
+            .info-label,
+            .score-label {
+                flex: 0 0 100px;
+                letter-spacing: 2px;
+            }
+
+            .score-value {
+                font-size: 14px;
+            }
+
+            .score-row.total .score-value {
+                font-size: 14px;
+            }
+
+            .captcha-img {
+                width: 80px;
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============================================
+         登录页
+         ============================================ -->
+    <div id="loginPage">
+
+        <!-- 顶部 Logo 区 -->
+        <header class="topbar">
+            <div class="topbar-inner">
+                <div class="brand">
+                    <!-- NEEA 盾形 Logo SVG -->
+                    <svg class="brand-logo" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-label="NEEA Logo">
+                        <!-- 外圈深蓝盾形 -->
+                        <path d="M32 4 L56 14 L56 32 C56 46 46 56 32 60 C18 56 8 46 8 32 L8 14 Z"
+                              fill="#003F88" stroke="#003F88" stroke-width="1"/>
+                        <!-- 内圈浅色 -->
+                        <path d="M32 10 L50 17 L50 32 C50 43 42 51 32 54 C22 51 14 43 14 32 L14 17 Z"
+                              fill="#FFFFFF"/>
+                        <!-- NEEA 字样 -->
+                        <text x="32" y="30" text-anchor="middle" font-family="Arial, sans-serif"
+                              font-size="10" font-weight="700" fill="#003F88">NEEA</text>
+                        <!-- 装饰条纹 -->
+                        <line x1="20" y1="36" x2="44" y2="36" stroke="#D9534F" stroke-width="1.5"/>
+                        <line x1="22" y1="40" x2="42" y2="40" stroke="#003F88" stroke-width="1"/>
+                        <!-- 五角星 -->
+                        <polygon points="32,42 33.2,44.5 36,44.5 33.8,46.2 34.6,48.7 32,47 29.4,48.7 30.2,46.2 28,44.5 30.8,44.5"
+                                 fill="#D9534F"/>
+                    </svg>
+                    <div class="brand-text">
+                        <span class="brand-title">中国教育考试网</span>
+                        <span class="brand-subtitle">NATIONAL EDUCATION EXAMINATIONS AUTHORITY</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- 登录卡片 -->
+        <div class="login-wrap">
+            <div class="login-card">
+                <h2 class="login-title">考生登录</h2>
+                <p class="login-subtitle">请使用报名时的证件号码查询成绩</p>
+
+                <form id="loginForm" autocomplete="off" novalidate>
+                    <div class="form-group">
+                        <input type="text" id="accountInput" class="form-input"
+                               placeholder="请输入证件号码 / 账号" maxlength="30">
+                    </div>
+
+                    <div class="form-group">
+                        <input type="password" id="passwordInput" class="form-input"
+                               placeholder="请输入密码" maxlength="30">
+                    </div>
+
+                    <div class="form-group">
+                        <div class="captcha-row">
+                            <input type="text" id="captchaInput" class="form-input"
+                                   placeholder="请输入验证码" maxlength="4">
+                            <div id="captchaImg" class="captcha-img" title="点击刷新">A1B2</div>
+                            <span class="captcha-refresh" id="captchaRefresh">换一张</span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="login-btn" id="loginBtn">登 录</button>
+                    <div class="login-msg" id="loginMsg"></div>
+
+                    <div class="login-extras">
+                        <a href="javascript:void(0)" onclick="alert('请联系学校教务处重置密码')">忘记密码？</a>
+                        <a href="javascript:void(0)" onclick="alert('考生注册请前往学校教务系统')">立即注册</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- 页脚 -->
+        <footer class="footer">
+            © 2001-2026 中国教育考试网 | 教育部教育考试院 | 京ICP备11046883号
+        </footer>
+    </div>
+
+
+    <!-- ============================================
+         成绩页
+         ============================================ -->
+    <div id="scorePage" class="hidden">
+
+        <!-- 顶部 Logo 区（含退出按钮） -->
+        <header class="topbar">
+            <div class="topbar-inner">
+                <div class="brand">
+                    <svg class="brand-logo" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-label="NEEA Logo">
+                        <path d="M32 4 L56 14 L56 32 C56 46 46 56 32 60 C18 56 8 46 8 32 L8 14 Z"
+                              fill="#003F88" stroke="#003F88" stroke-width="1"/>
+                        <path d="M32 10 L50 17 L50 32 C50 43 42 51 32 54 C22 51 14 43 14 32 L14 17 Z"
+                              fill="#FFFFFF"/>
+                        <text x="32" y="30" text-anchor="middle" font-family="Arial, sans-serif"
+                              font-size="10" font-weight="700" fill="#003F88">NEEA</text>
+                        <line x1="20" y1="36" x2="44" y2="36" stroke="#D9534F" stroke-width="1.5"/>
+                        <line x1="22" y1="40" x2="42" y2="40" stroke="#003F88" stroke-width="1"/>
+                        <polygon points="32,42 33.2,44.5 36,44.5 33.8,46.2 34.6,48.7 32,47 29.4,48.7 30.2,46.2 28,44.5 30.8,44.5"
+                                 fill="#D9534F"/>
+                    </svg>
+                    <div class="brand-text">
+                        <span class="brand-title">中国教育考试网</span>
+                        <span class="brand-subtitle">NATIONAL EDUCATION EXAMINATIONS AUTHORITY</span>
+                    </div>
+                </div>
+                <div class="topbar-actions">
+                    <a class="logout-link" id="logoutBtn">退出登录</a>
+                </div>
+            </div>
+        </header>
+
+        <!-- 蓝色导航栏 -->
+        <nav class="navbar">
+            <div class="navbar-inner">
+                <a class="nav-item active">首页</a>
+                <a class="nav-item">考试资讯</a>
+                <a class="nav-item">公示公告</a>
+                <a class="nav-item">考试项目</a>
+                <a class="nav-item">考试服务</a>
+            </div>
+        </nav>
+
+        <!-- 面包屑 -->
+        <div class="breadcrumb">
+            <a href="javascript:void(0)">首页</a> &gt; <span>成绩查询</span>
+        </div>
+
+        <!-- 主内容 -->
+        <main class="page-main">
+            <h1 class="page-title">全国大学英语六级考试(CET6)成绩详情</h1>
+
+            <!-- 第一信息卡：基本信息（按要求仅 2 行：姓名/学校 已删除） -->
+            <div class="card">
+                <div class="card-body">
+                    <div class="info-row">
+                        <div class="info-label">证件号码</div>
+                        <div class="info-value" id="idNumberValue">--</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">成绩报告单编号</div>
+                        <div class="info-value" id="reportIdValue">1234567890123456</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 笔试成绩卡 -->
+            <div class="card">
+                <div class="card-header">笔试成绩</div>
+                <div class="card-body">
+                    <div class="info-row">
+                        <div class="info-label">准考证号</div>
+                        <div class="info-value" id="examNumberValue">1234567890123456</div>
+                    </div>
+                    <div class="score-row total">
+                        <div class="score-label">总　　分</div>
+                        <div class="score-value" id="totalScore">416</div>
+                    </div>
+                    <div class="score-row">
+                        <div class="score-label">听　　力</div>
+                        <div class="score-value" id="listeningScore">132</div>
+                    </div>
+                    <div class="score-row">
+                        <div class="score-label">阅　　读</div>
+                        <div class="score-value" id="readingScore">150</div>
+                    </div>
+                    <div class="score-row">
+                        <div class="score-label">写作和翻译</div>
+                        <div class="score-value" id="writingScore">134</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 口试成绩卡 -->
+            <div class="card">
+                <div class="card-header">口试成绩</div>
+                <div class="card-body">
+                    <div class="info-row">
+                        <div class="info-label">准考证号</div>
+                        <div class="info-value">--</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">成　　绩</div>
+                        <div class="info-value">--</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- 页脚 -->
+        <footer class="footer">
+            © 2001-2026 中国教育考试网 | 教育部教育考试院 | 京ICP备11046883号
+        </footer>
+    </div>
+
+
+    <!-- ============================================
+         JS：交互逻辑
+         ============================================ -->
+    <script>
+        /**
+         * 用户输入数据：登录时填写的账号（视为证件号）
+         */
+        const USER_INPUT = {
+            idNumber: ''
+        };
+
+        /**
+         * 固定数据（成绩项与编号在登录时随机生成，不在此处硬编码）
+         */
+        const FIXED_DATA = {
+            oralExamNumber: '--',
+            oralScore: '--'
+        };
+
+        /**
+         * 当前会话生成的随机数据（每次登录时刷新）
+         */
+        let CURRENT_DATA = {
+            reportId: '',      // 成绩报告单编号（16位随机数字）
+            examNumber: '',    // 笔试准考证号（16位随机数字）
+            listening: 0,
+            reading: 0,
+            writing: 0,
+            total: 0
+        };
+
+        /**
+         * 生成 [min, max] 范围内的随机整数（含两端）
+         */
+        function randInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        /**
+         * 生成指定位数的随机数字字符串（乱序，不保证不重复位）
+         */
+        function randomNumberString(length) {
+            let result = '';
+            for (let i = 0; i < length; i++) {
+                result += randInt(0, 9);
+            }
+            return result;
+        }
+
+        /**
+         * 随机生成两个 16 位编号 + 三项分数（130~150），并保证总分不超过 424
+         * - 成绩报告单编号：16 位随机数字
+         * - 笔试准考证号：16 位随机数字
+         * - 听力 / 阅读 / 写作和翻译：130~150 整数
+         * - 总分（听力+阅读+写作）≤ 424
+         */
+        function generateRandomData() {
+            // 先生成两个 16 位乱序数字编号
+            CURRENT_DATA.reportId = randomNumberString(16);
+            CURRENT_DATA.examNumber = randomNumberString(16);
+
+            // 再生成三项分数并校验总分约束
+            const MIN = 130;
+            const MAX = 150;
+            const TOTAL_LIMIT = 424;
+            const MAX_TRY = 100;
+
+            let listening, reading, writing, total;
+
+            for (let i = 0; i < MAX_TRY; i++) {
+                listening = randInt(MIN, MAX);
+                reading = randInt(MIN, MAX);
+                writing = randInt(MIN, MAX);
+                total = listening + reading + writing;
+
+                if (total <= TOTAL_LIMIT) {
+                    CURRENT_DATA.listening = listening;
+                    CURRENT_DATA.reading = reading;
+                    CURRENT_DATA.writing = writing;
+                    CURRENT_DATA.total = total;
+                    return;
+                }
+            }
+
+            // 兜底（理论上 100 次内必能满足）
+            listening = MIN;
+            reading = MIN;
+            writing = Math.min(MAX, TOTAL_LIMIT - listening - reading);
+            CURRENT_DATA.listening = listening;
+            CURRENT_DATA.reading = reading;
+            CURRENT_DATA.writing = writing;
+            CURRENT_DATA.total = listening + reading + writing;
+        }
+
+        /**
+         * 生成 4 位随机验证码（字母+数字）
+         */
+        function generateCaptcha() {
+            const chars = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+            let result = '';
+            for (let i = 0; i < 4; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+
+        /**
+         * 刷新验证码显示
+         */
+        function refreshCaptcha() {
+            const captchaImg = document.getElementById('captchaImg');
+            if (captchaImg) {
+                captchaImg.textContent = generateCaptcha();
+            }
+        }
+
+        /**
+         * 切换到成绩页
+         */
+        function showScorePage() {
+            // 每次进入成绩页都重新生成一次随机数据（编号 + 分数）
+            generateRandomData();
+
+            // 渲染用户输入的证件号（保留用户输入）
+            document.getElementById('idNumberValue').textContent = USER_INPUT.idNumber || '--';
+
+            // 渲染随机生成的编号
+            document.getElementById('reportIdValue').textContent = CURRENT_DATA.reportId;
+            document.getElementById('examNumberValue').textContent = CURRENT_DATA.examNumber;
+
+            // 渲染随机生成的成绩
+            document.getElementById('totalScore').textContent = CURRENT_DATA.total;
+            document.getElementById('listeningScore').textContent = CURRENT_DATA.listening;
+            document.getElementById('readingScore').textContent = CURRENT_DATA.reading;
+            document.getElementById('writingScore').textContent = CURRENT_DATA.writing;
+
+            // 切换显示
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('scorePage').classList.remove('hidden');
+
+            // 滚动到顶部
+            window.scrollTo(0, 0);
+        }
+
+        /**
+         * 切换回登录页
+         */
+        function showLoginPage() {
+            document.getElementById('scorePage').classList.add('hidden');
+            document.getElementById('loginPage').classList.remove('hidden');
+
+            // 清空密码框，保留账号以便查看
+            document.getElementById('passwordInput').value = '';
+            document.getElementById('captchaInput').value = '';
+            refreshCaptcha();
+
+            window.scrollTo(0, 0);
+        }
+
+        /**
+         * 处理登录提交
+         * 按需求：账号密码任填（仅校验非空），不校验密码正确性
+         */
+        function handleLogin(event) {
+            event.preventDefault();
+
+            const account = document.getElementById('accountInput').value.trim();
+            const password = document.getElementById('passwordInput').value.trim();
+            const captcha = document.getElementById('captchaInput').value.trim().toUpperCase();
+            const captchaImg = document.getElementById('captchaImg').textContent.trim().toUpperCase();
+            const msgEl = document.getElementById('loginMsg');
+            const btn = document.getElementById('loginBtn');
+
+            // 清空旧提示
+            msgEl.textContent = '';
+
+            // 校验非空
+            if (!account) {
+                msgEl.textContent = '请输入证件号码 / 账号';
+                return;
+            }
+            if (!password) {
+                msgEl.textContent = '请输入密码';
+                return;
+            }
+            if (!captcha) {
+                msgEl.textContent = '请输入验证码';
+                return;
+            }
+            if (captcha !== captchaImg) {
+                msgEl.textContent = '验证码不正确，请重新输入';
+                refreshCaptcha();
+                document.getElementById('captchaInput').value = '';
+                return;
+            }
+
+            // 校验通过：保存账号到 USER_INPUT
+            USER_INPUT.idNumber = account;
+
+            // 显示 loading 效果后跳转
+            btn.classList.add('loading');
+            btn.disabled = true;
+            btn.textContent = '登录中...';
+
+            setTimeout(function() {
+                btn.classList.remove('loading');
+                btn.disabled = false;
+                btn.textContent = '登 录';
+                showScorePage();
+            }, 500);
+        }
+
+        /**
+         * 页面初始化
+         */
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化验证码
+            refreshCaptcha();
+
+            // 绑定登录提交
+            document.getElementById('loginForm').addEventListener('submit', handleLogin);
+
+            // 绑定验证码点击刷新
+            document.getElementById('captchaImg').addEventListener('click', refreshCaptcha);
+            document.getElementById('captchaRefresh').addEventListener('click', refreshCaptcha);
+
+            // 绑定退出按钮
+            document.getElementById('logoutBtn').addEventListener('click', function() {
+                if (confirm('确定要退出登录吗？')) {
+                    showLoginPage();
+                }
+            });
+
+            // 导航项点击交互（仅切换 active 视觉态，不做实际跳转）
+            document.querySelectorAll('.nav-item').forEach(function(item) {
+                item.addEventListener('click', function() {
+                    document.querySelectorAll('.nav-item').forEach(function(n) {
+                        n.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
