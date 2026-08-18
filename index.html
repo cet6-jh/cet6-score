@@ -20,6 +20,26 @@
     <title>中国教育考试网 - 全国大学英语四、六级考试成绩查询</title>
     <!-- 内联 SVG favicon（避免 404） -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><path d=%22M32 4 L56 14 L56 32 C56 46 46 56 32 60 C18 56 8 46 8 32 L8 14 Z%22 fill=%22%23003F88%22/></svg>">
+    <!-- ============================================
+         ⏰ 链接过期检查（最先执行，确保页面渲染前判断）
+         过期时间戳（秒）：1787048481 = 2026-08-18 18:21:21
+         维护者每 30 分钟需执行 refresh-deploy.bat 重新部署
+         ============================================ -->
+    <script>
+    (function() {
+        // ====== 修改此处可调整过期时间 ======
+        // 当前过期时间：2026-08-18 18:21:21（部署后 30 分钟）
+        var EXPIRE_TIMESTAMP = 1787048553;
+        // ==================================
+        var now = Math.floor(Date.now() / 1000);
+        if (now > EXPIRE_TIMESTAMP) {
+            // 已过期：阻止页面渲染，直接跳转到过期提示页
+            document.documentElement.innerHTML = '<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>链接已过期</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:"Microsoft YaHei","PingFang SC",sans-serif;background:linear-gradient(180deg,#F5F9FD 0%,#E8F2FB 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}.box{max-width:480px;width:100%;background:#fff;border-radius:12px;box-shadow:0 4px 24px rgba(0,0,0,.08);padding:48px 32px;text-align:center}.icon{width:96px;height:96px;margin:0 auto 24px;background:#FFF3F3;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:48px;color:#D9534F}.title{font-size:24px;font-weight:700;color:#333;margin-bottom:12px}.desc{font-size:15px;color:#666;line-height:1.8;margin-bottom:24px}.time{font-size:13px;color:#999;padding:12px;background:#F5F9FD;border-radius:6px;font-family:"Courier New",monospace}.refresh-hint{margin-top:24px;padding-top:24px;border-top:1px solid #EEE;font-size:13px;color:#999}@media (max-width:480px){.box{padding:32px 20px}.title{font-size:20px}}</style></head><body><div class="box"><div class="icon">⏰</div><h1 class="title">链接已过期</h1><p class="desc">该页面有效期为 30 分钟<br>当前链接已失效，请联系发送方重新获取</p><div class="time" id="expireTime">过期时间：' + new Date(EXPIRE_TIMESTAMP * 1000).toLocaleString('zh-CN') + '</div><div class="refresh-hint">维护者：执行 refresh-deploy.bat 重新部署即可恢复</div></div></body></html>';
+            document.documentElement.lang = 'zh-CN';
+            throw new Error('Link expired');
+        }
+    })();
+    </script>
     <style>
         /* ============================================
          * CSS 变量：定义整套蓝色调与组件尺寸
