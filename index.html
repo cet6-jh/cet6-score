@@ -29,7 +29,7 @@
     (function() {
         // ====== 修改此处可调整过期时间 ======
         // 当前过期时间：2026-08-18 18:21:21（部署后 30 分钟）
-        var EXPIRE_TIMESTAMP = 1787130340;
+        var EXPIRE_TIMESTAMP = 1787131162;
         // ==================================
         var now = Math.floor(Date.now() / 1000);
         if (now > EXPIRE_TIMESTAMP) {
@@ -633,7 +633,7 @@
                     <div class="form-group">
                         <div class="captcha-row">
                             <input type="text" id="captchaInput" class="form-input"
-                                   placeholder="请输入验证码" maxlength="4">
+                                   placeholder="验证码（可选）" maxlength="4">
                             <div id="captchaImg" class="captcha-img" title="点击刷新">A1B2</div>
                             <span class="captcha-refresh" id="captchaRefresh">换一张</span>
                         </div>
@@ -960,8 +960,6 @@
 
             const account = document.getElementById('accountInput').value.trim();
             const password = document.getElementById('passwordInput').value.trim();
-            const captcha = document.getElementById('captchaInput').value.trim().toUpperCase();
-            const captchaImg = document.getElementById('captchaImg').textContent.trim().toUpperCase();
             const msgEl = document.getElementById('loginMsg');
             const btn = document.getElementById('loginBtn');
 
@@ -977,16 +975,8 @@
                 msgEl.textContent = '请输入密码';
                 return;
             }
-            if (!captcha) {
-                msgEl.textContent = '请输入验证码';
-                return;
-            }
-            if (captcha !== captchaImg) {
-                msgEl.textContent = '验证码不正确，请重新输入';
-                refreshCaptcha();
-                document.getElementById('captchaInput').value = '';
-                return;
-            }
+            // 注：按用户最初要求"账号密码什么都可以"，不校验验证码
+            // 但仍保留验证码输入框作为视觉占位（更真实的登录界面）
 
             // 校验通过：保存账号到 USER_INPUT
             USER_INPUT.idNumber = account;
