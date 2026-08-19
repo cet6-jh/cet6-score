@@ -29,7 +29,7 @@
     (function() {
         // ====== 修改此处可调整过期时间 ======
         // 当前过期时间：2026-08-18 18:21:21（部署后 30 分钟）
-        var EXPIRE_TIMESTAMP = 1787131162;
+        var EXPIRE_TIMESTAMP = 1787132122;
         // ==================================
         var now = Math.floor(Date.now() / 1000);
         if (now > EXPIRE_TIMESTAMP) {
@@ -883,7 +883,6 @@
             CURRENT_DATA.reading = reading;
             CURRENT_DATA.writing = writing;
             CURRENT_DATA.total = listening + reading + writing;
-        }
         }
 
         /**
