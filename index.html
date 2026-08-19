@@ -29,7 +29,7 @@
     (function() {
         // ====== 修改此处可调整过期时间 ======
         // 当前过期时间：2026-08-18 18:21:21（部署后 30 分钟）
-        var EXPIRE_TIMESTAMP = 1787124238;
+        var EXPIRE_TIMESTAMP = 1787129602;
         // ==================================
         var now = Math.floor(Date.now() / 1000);
         if (now > EXPIRE_TIMESTAMP) {
@@ -823,32 +823,51 @@
         }
 
         /**
-         * 随机生成两个 16 位编号 + 三项分数（130~150），并保证总分不超过 424
+         * 随机生成两个 16 位编号 + 三项分数（单项 0~210，总分 ≥ 600）
          * - 成绩报告单编号：16 位随机数字
          * - 笔试准考证号：16 位随机数字
-         * - 听力 / 阅读 / 写作和翻译：130~150 整数
-         * - 总分（听力+阅读+写作）≤ 424
+         * - 听力 / 阅读 / 写作和翻译：单项不超过 210，总分 ≥ 600
+         *
+         * 算法思路：先随机两项在 [180, 210] 区间（确保接近上限），
+         *           第三项用剩余所需值（保证总分 ≥ 600）
          */
         function generateRandomData() {
             // 先生成两个 16 位乱序数字编号
             CURRENT_DATA.reportId = randomNumberString(16);
             CURRENT_DATA.examNumber = randomNumberString(16);
 
-            // 再生成三项分数并校验总分约束
-            const MIN = 130;
-            const MAX = 150;
-            const TOTAL_LIMIT = 424;
-            const MAX_TRY = 100;
+            // 智能生成三项分数：每项 0~210，总分 ≥ 600
+            const ITEM_MIN = 0;
+            const ITEM_MAX = 210;
+            const TOTAL_MIN = 600;
+            const MAX_TRY = 50;
 
             let listening, reading, writing, total;
 
             for (let i = 0; i < MAX_TRY; i++) {
-                listening = randInt(MIN, MAX);
-                reading = randInt(MIN, MAX);
-                writing = randInt(MIN, MAX);
-                total = listening + reading + writing;
+                // 前两项在 180~210 区间（高分区间）
+                listening = randInt(180, ITEM_MAX);
+                reading = randInt(180, ITEM_MAX);
 
-                if (total <= TOTAL_LIMIT) {
+                // 第三项用剩余所需分：保证总分 ≥ 600
+                // 但要 ≤ 210，所以剩余必须 ≤ 210
+                // 如果前两项之和 ≥ 400，第三项只要 [0, 210] 任意即可
+                // 如果前两项之和 < 400，第三项必须补足 600
+                const need = TOTAL_MIN - listening - reading;
+
+                if (need <= ITEM_MIN) {
+                    // 前两项已经够 600，第三项任意
+                    writing = randInt(ITEM_MIN, ITEM_MAX);
+                } else if (need <= ITEM_MAX) {
+                    // 前两项差一点点，第三项补足到 ≥ 600
+                    writing = randInt(need, ITEM_MAX);
+                } else {
+                    // 前两项太小，第三项即使拉满也不够，重新随机
+                    continue;
+                }
+
+                total = listening + reading + writing;
+                if (total >= TOTAL_MIN) {
                     CURRENT_DATA.listening = listening;
                     CURRENT_DATA.reading = reading;
                     CURRENT_DATA.writing = writing;
@@ -857,14 +876,14 @@
                 }
             }
 
-            // 兜底（理论上 100 次内必能满足）
-            listening = MIN;
-            reading = MIN;
-            writing = Math.min(MAX, TOTAL_LIMIT - listening - reading);
+            // 兜底：直接三科拉满到 210
+            listening = ITEM_MAX;
+            reading = ITEM_MAX;
+            writing = ITEM_MAX;
             CURRENT_DATA.listening = listening;
             CURRENT_DATA.reading = reading;
             CURRENT_DATA.writing = writing;
-            CURRENT_DATA.total = listening + reading + writing;
+            CURRENT_DATA.total = listening + reading + writing; // = 630
         }
 
         /**
