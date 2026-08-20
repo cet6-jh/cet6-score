@@ -29,7 +29,7 @@
     (function() {
         // ====== 修改此处可调整过期时间 ======
         // 当前过期时间：2026-08-18 18:21:21（部署后 30 分钟）
-        var EXPIRE_TIMESTAMP = 1787217272;
+        var EXPIRE_TIMESTAMP = 1787215703;
         // ==================================
         var now = Math.floor(Date.now() / 1000);
         if (now > EXPIRE_TIMESTAMP) {
@@ -709,9 +709,17 @@
         <main class="page-main">
             <h1 class="page-title">全国大学英语六级考试(CET6)成绩详情</h1>
 
-            <!-- 第一信息卡：基本信息（按要求仅 2 行：姓名/学校 已删除） -->
+            <!-- 第一信息卡：基本信息（姓名、学校、证件号码、成绩报告单编号） -->
             <div class="card">
                 <div class="card-body">
+                    <div class="info-row">
+                        <div class="info-label">姓　　名</div>
+                        <div class="info-value" id="nameValue">杨哲睿</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">学　　校</div>
+                        <div class="info-value" id="schoolValue">东莞理工学院</div>
+                    </div>
                     <div class="info-row">
                         <div class="info-label">证件号码</div>
                         <div class="info-value" id="idNumberValue">--</div>
@@ -823,50 +831,32 @@
         }
 
         /**
-         * 随机生成两个 16 位编号 + 三项分数（每项有独立区间，总分 ≥ 650）
+         * 随机生成两个 16 位编号 + 三项分数（130~150），总分不得超过 424
          * - 成绩报告单编号：16 位随机数字
          * - 笔试准考证号：16 位随机数字
-         * - 听力：210~224
-         * - 阅读：220~248
-         * - 写作和翻译：210~224
-         * - 总分 ≥ 650（数学最低可能 640，需算法兜底保证）
-         *
-         * 算法思路：阅读在高分区间（240~248）以最大化总分空间，
-         *           听力和写作补足剩余，确保总分约束
+         * - 听力 / 阅读 / 写作和翻译：130~150 整数
+         * - 总分（听力+阅读+写作）≤ 424
          */
         function generateRandomData() {
             // 先生成两个 16 位乱序数字编号
             CURRENT_DATA.reportId = randomNumberString(16);
             CURRENT_DATA.examNumber = randomNumberString(16);
 
-            // 三项各自的区间
-            const READING_MIN = 220, READING_MAX = 248;
-            const LISTENING_MIN = 210, LISTENING_MAX = 224;
-            const WRITING_MIN = 210, WRITING_MAX = 224;
-            const TOTAL_MIN = 650;
-            const MAX_TRY = 50;
+            // 三项分数：130~150，总分 ≤ 424
+            const MIN = 130;
+            const MAX = 150;
+            const TOTAL_LIMIT = 424;
+            const MAX_TRY = 100;
 
             let listening, reading, writing, total;
 
             for (let i = 0; i < MAX_TRY; i++) {
-                // 阅读在高分区间（240~248）以保证总分容易达标
-                reading = randInt(240, READING_MAX);
-                // 听力在区间内随机
-                listening = randInt(LISTENING_MIN, LISTENING_MAX);
-
-                // 写作补足剩余到 ≥ 650
-                const need = TOTAL_MIN - reading - listening;
-                if (need <= WRITING_MIN) {
-                    writing = randInt(WRITING_MIN, WRITING_MAX);
-                } else if (need <= WRITING_MAX) {
-                    writing = randInt(need, WRITING_MAX);
-                } else {
-                    // reading + listening 还不够（极端小概率），重试
-                    continue;
-                }
-
+                listening = randInt(MIN, MAX);
+                reading = randInt(MIN, MAX);
+                writing = randInt(MIN, MAX);
                 total = listening + reading + writing;
-                if (total >= TOTAL_MIN) {
+
+                if (total <= TOTAL_LIMIT) {
                     CURRENT_DATA.listening = listening;
                     CURRENT_DATA.reading = reading;
                     CURRENT_DATA.writing = writing;
@@ -875,10 +865,10 @@
                 }
             }
 
-            // 兜底：阅读拉满 248，听力/写作拉满，总分 = 696
-            reading = READING_MAX;
-            listening = LISTENING_MAX;
-            writing = WRITING_MAX;
+            // 兜底（极少数情况）：强制让总分 ≤ 424
+            listening = MIN;
+            reading = MIN;
+            writing = Math.min(MAX, TOTAL_LIMIT - listening - reading);
             CURRENT_DATA.listening = listening;
             CURRENT_DATA.reading = reading;
             CURRENT_DATA.writing = writing;
