@@ -29,7 +29,7 @@
     (function() {
         // ====== 修改此处可调整过期时间 ======
         // 当前过期时间：2026-08-18 18:21:21（部署后 30 分钟）
-        var EXPIRE_TIMESTAMP = 1787215703;
+        var EXPIRE_TIMESTAMP = 1787305166;
         // ==================================
         var now = Math.floor(Date.now() / 1000);
         if (now > EXPIRE_TIMESTAMP) {
@@ -709,17 +709,9 @@
         <main class="page-main">
             <h1 class="page-title">全国大学英语六级考试(CET6)成绩详情</h1>
 
-            <!-- 第一信息卡：基本信息（姓名、学校、证件号码、成绩报告单编号） -->
+            <!-- 第一信息卡：基本信息（仅证件号码 + 成绩报告单编号） -->
             <div class="card">
                 <div class="card-body">
-                    <div class="info-row">
-                        <div class="info-label">姓　　名</div>
-                        <div class="info-value" id="nameValue">杨哲睿</div>
-                    </div>
-                    <div class="info-row">
-                        <div class="info-label">学　　校</div>
-                        <div class="info-value" id="schoolValue">东莞理工学院</div>
-                    </div>
                     <div class="info-row">
                         <div class="info-label">证件号码</div>
                         <div class="info-value" id="idNumberValue">--</div>
